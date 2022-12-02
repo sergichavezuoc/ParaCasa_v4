@@ -23,11 +23,14 @@ import com.example.demo.model.User;
 import com.example.demo.repository.MenuRepository;
 import com.example.demo.repository.UserRepository;
 
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 
 @CrossOrigin(origins = "http://localhost:8081")
 @Controller
 @RequestMapping("/admin")
-
+@EnableSwagger2
 
 
 public class UserController {
@@ -37,7 +40,8 @@ public class UserController {
   UserRepository userRepository;
   @Autowired
   MenuRepository menuRepository;
-  @GetMapping(value ="/users")
+  
+
   public String getAllUsers(@RequestParam(required = false) String title, Model model) {
     try {
       List<User> users = new ArrayList<User>();

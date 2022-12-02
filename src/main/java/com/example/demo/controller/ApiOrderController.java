@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,64 +19,61 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.demo.model.Menu;
+import com.example.demo.model.Order;
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-
-import io.swagger.annotations.ApiOperation;
+import com.example.demo.repository.OrderRepository;
 
 
 
 @CrossOrigin(origins = "http://localhost:8081")
 @Controller
 @RequestMapping("/api/private")
-public class ApiUserController {
+public class ApiOrderController {
 
 @Autowired
-UserRepository userRepository;
-@ApiOperation(value = "Acá nombramos la operación"
-,notes = "Podemos incluir una descripción más detallada que será útil al cliente")
-
-@GetMapping("/users")
-public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) {
+OrderRepository orderRepository;
+@GetMapping("/orders")
+public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false) String name) {
   try {
-    List<User> users = new ArrayList<User>();
-      userRepository.findAll().forEach(users::add);
+    List<Order> orders = new ArrayList<Order>();
+      orderRepository.findAll().forEach(orders::add);
 
-    if (users.isEmpty()) {
+    if (orders.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    return new ResponseEntity<>(users, HttpStatus.OK);
+    return new ResponseEntity<>(orders, HttpStatus.OK);
   } catch (Exception e) {
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
-@PostMapping("/private/users")
-public ResponseEntity<User> createRestaurant(@RequestBody User user) {
+@PostMapping("/private/orders")
+public ResponseEntity<Order> createRestaurant(@RequestBody User user, @RequestBody Menu menu) {
   try {
-    User _user = userRepository.save(new User(user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getPassword()));
-    return new ResponseEntity<>(_user, HttpStatus.CREATED);
+    Order _order = orderRepository.save(new Order(user, menu));
+    return new ResponseEntity<>(_order, HttpStatus.CREATED);
   } catch (Exception e) {
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
-@PutMapping("/private/users/{id}")
-public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
-  Optional<User> userData = userRepository.findById(id);
+@PutMapping("/private/orders/{id}")
+public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody LocalDateTime dateAdded, @RequestBody User user) {
+  Optional<Order> orderData = orderRepository.findById(id);
 
-  if (userData.isPresent()) {
-    User _user = userData.get();
-    _user.setName(user.getName());
-    _user.setSurname(user.getSurname());
-    return new ResponseEntity<>(userRepository.save(_user), HttpStatus.OK);
+  if (orderData.isPresent()) {
+    Order _order = orderData.get();
+    _order.setUser(user);
+    _order.setDateAdded(dateAdded);
+    return new ResponseEntity<>(orderRepository.save(_order), HttpStatus.OK);
   } else {
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
-@DeleteMapping("/private/users/{id}")
-public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") long id) {
+@DeleteMapping("/private/orders/{id}")
+public ResponseEntity<HttpStatus> deleteOrder(@PathVariable("id") long id) {
   try {
-    userRepository.deleteById(id);
+    orderRepository.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   } catch (Exception e) {
     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -41,6 +41,12 @@ public class Order {
 		this.user = user;
 		this.dateAdded = LocalDateTime.now();
 	}
+	public Order(User user, Menu menu) {
+		this.user = user;
+		this.dateAdded = LocalDateTime.now();
+		this.menus.add(menu);
+		menu.getOrders().add(this);
+	}
 
 	public void addMenu(Menu menu) {
 		this.menus.add(menu);
@@ -67,7 +73,9 @@ public class Order {
 	public Set<Menu> getMenus() {
 		return menus;
 	}
-
+	public void setUser(User user) {
+		this.user=user;
+	}
 	public void setMenus(Set<Menu> menus) {
 		this.menus = menus;
 	}

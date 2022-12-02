@@ -22,7 +22,7 @@ public class SwaggerConfig {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.example.demo.controller"))
-				.paths(PathSelectors.any())
+				.paths(PathSelectors.ant("/api/**"))
 				.build()
 				.apiInfo(getApiInfo())
 				;
@@ -33,11 +33,12 @@ public class SwaggerConfig {
 				"Order Service API",
 				"Order Service API Description",
 				"1.0",
-				"http://codmind.com/terms",
-				new Contact("Codmind", "https://codmind.com", "apis@codmind.com"),
+				"http://localhost:8080/terms",
+				new Contact("ParaCasa", "https://localhost:8080", "apis@paracasa.com"),
 				"LICENSE",
 				"LICENSE URL",
 				Collections.emptyList()
 				);
 	}
+	
 }

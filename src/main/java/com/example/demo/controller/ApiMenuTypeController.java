@@ -18,64 +18,58 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-
-import io.swagger.annotations.ApiOperation;
+import com.example.demo.model.MenuType;
+import com.example.demo.repository.MenuTypeRepository;
 
 
 
 @CrossOrigin(origins = "http://localhost:8081")
 @Controller
 @RequestMapping("/api/private")
-public class ApiUserController {
+public class ApiMenuTypeController {
 
 @Autowired
-UserRepository userRepository;
-@ApiOperation(value = "Acá nombramos la operación"
-,notes = "Podemos incluir una descripción más detallada que será útil al cliente")
-
-@GetMapping("/users")
-public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) {
+MenuTypeRepository menuTypeRepository;
+@GetMapping("/menutypes")
+public ResponseEntity<List<MenuType>> getAllMenuTypes(@RequestParam(required = false) String name) {
   try {
-    List<User> users = new ArrayList<User>();
-      userRepository.findAll().forEach(users::add);
+    List<MenuType> menutypes = new ArrayList<MenuType>();
+      menuTypeRepository.findAll().forEach(menutypes::add);
 
-    if (users.isEmpty()) {
+    if (menutypes.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    return new ResponseEntity<>(users, HttpStatus.OK);
+    return new ResponseEntity<>(menutypes, HttpStatus.OK);
   } catch (Exception e) {
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
-@PostMapping("/private/users")
-public ResponseEntity<User> createRestaurant(@RequestBody User user) {
+@PostMapping("/private/menutypes")
+public ResponseEntity<MenuType> createRestaurant(@RequestBody String type) {
   try {
-    User _user = userRepository.save(new User(user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getPassword()));
-    return new ResponseEntity<>(_user, HttpStatus.CREATED);
+    MenuType _menuType = menuTypeRepository.save(new MenuType(type));
+    return new ResponseEntity<>(_menuType, HttpStatus.CREATED);
   } catch (Exception e) {
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
-@PutMapping("/private/users/{id}")
-public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
-  Optional<User> userData = userRepository.findById(id);
+@PutMapping("/private/menutypes/{id}")
+public ResponseEntity<MenuType> updateMenuType(@PathVariable("id") long id, @RequestBody String type) {
+  Optional<MenuType> menuTypeData = menuTypeRepository.findById(id);
 
-  if (userData.isPresent()) {
-    User _user = userData.get();
-    _user.setName(user.getName());
-    _user.setSurname(user.getSurname());
-    return new ResponseEntity<>(userRepository.save(_user), HttpStatus.OK);
+  if (menuTypeData.isPresent()) {
+    MenuType _menuType = menuTypeData.get();
+    _menuType.setType(type);
+    return new ResponseEntity<>(menuTypeRepository.save(_menuType), HttpStatus.OK);
   } else {
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
-@DeleteMapping("/private/users/{id}")
-public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") long id) {
+@DeleteMapping("/private/menutypes/{id}")
+public ResponseEntity<HttpStatus> deleteMenuType(@PathVariable("id") long id) {
   try {
-    userRepository.deleteById(id);
+    menuTypeRepository.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   } catch (Exception e) {
     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
