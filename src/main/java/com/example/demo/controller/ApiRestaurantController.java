@@ -23,6 +23,9 @@ import com.example.demo.model.Restaurant;
 import com.example.demo.repository.MenuRepository;
 import com.example.demo.repository.RestaurantRepository;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 
 @CrossOrigin(origins = "http://localhost:8081")
 @Controller
@@ -31,9 +34,17 @@ public class ApiRestaurantController {
 
 @Autowired
 RestaurantRepository restaurantRepository;
-
+@ApiOperation(value = "List Restaurants"
+,notes = "List all available Restaurants: public")
 @GetMapping("/restaurants")
-public ResponseEntity<List<Restaurant>> getAllRestaurants(@RequestParam(required = false) String name) {
+public ResponseEntity<List<Restaurant>> getAllRestaurants(
+  @ApiParam(
+    name =  "name",
+    type = "String",
+    value = "Word in restaurant name",
+    example = "sol naciente",
+    required = false)     
+@RequestParam(required = false) String name) {
   try {
     List<Restaurant> restaurants = new ArrayList<Restaurant>();
     if (name == null)
@@ -50,8 +61,15 @@ public ResponseEntity<List<Restaurant>> getAllRestaurants(@RequestParam(required
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+@ApiOperation(value = "Create Restaurant"
+,notes = "Require token validation")
 @PostMapping("/private/restaurants")
-public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant restaurant) {
+public ResponseEntity<Restaurant> createRestaurant(  
+  @ApiParam(
+    name =  "restaurant",
+    value = "Restaurant Object",
+    required = true)   
+  @RequestBody Restaurant restaurant) {
   try {
     Restaurant _restaurant = restaurantRepository
         .save(new Restaurant(restaurant.getName(), restaurant.getDescription(), false));
@@ -61,7 +79,17 @@ public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant resta
   }
 }
 @PutMapping("/private/restaurants/{id}")
-public ResponseEntity<Restaurant> updateRestaurant(@PathVariable("id") long id, @RequestBody Restaurant restaurant) {
+public ResponseEntity<Restaurant> updateRestaurant(
+  @ApiParam(
+    name =  "id",
+    value = "Restaurant id",
+    required = true)   
+@PathVariable("id") long id, 
+@ApiParam(
+  name =  "menu",
+  value = "Menu Object",
+  required = true)   
+@RequestBody Restaurant restaurant) {
   Optional<Restaurant> restaurantData = restaurantRepository.findById(id);
 
   if (restaurantData.isPresent()) {
@@ -74,7 +102,12 @@ public ResponseEntity<Restaurant> updateRestaurant(@PathVariable("id") long id, 
   }
 }
 @DeleteMapping("/private/restaurants/{id}")
-public ResponseEntity<HttpStatus> deleteRestaurant(@PathVariable("id") long id) {
+public ResponseEntity<HttpStatus> deleteRestaurant(
+  @ApiParam(
+    name =  "id",
+    value = "Restaurant id",
+    required = true)     
+@PathVariable("id") long id) {
   try {
     restaurantRepository.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

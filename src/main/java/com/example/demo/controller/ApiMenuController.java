@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.model.Menu;
-import com.example.demo.model.Restaurant;
 import com.example.demo.repository.MenuRepository;
-import com.example.demo.repository.RestaurantRepository;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 
 @CrossOrigin(origins = "http://localhost:8081")
@@ -31,8 +32,17 @@ public class ApiMenuController {
 
 @Autowired
 MenuRepository menuRepository;
+@ApiOperation(value = "List Menus"
+,notes = "List all available Menus: public")
 @GetMapping("/menus")
-public ResponseEntity<List<Menu>> getAllMenus(@RequestParam(required = false) String name) {
+public ResponseEntity<List<Menu>> getAllMenus(
+  @ApiParam(
+    name =  "name",
+    type = "String",
+    value = "Word in menu name",
+    example = "rollitos",
+    required = false)   
+@RequestParam(required = false) String name) {
   try {
     List<Menu> menus = new ArrayList<Menu>();
     if (name == null)
@@ -49,8 +59,15 @@ public ResponseEntity<List<Menu>> getAllMenus(@RequestParam(required = false) St
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+@ApiOperation(value = "Create Menu"
+,notes = "Require token validation")
 @PostMapping("/private/menus")
-public ResponseEntity<Menu> createRestaurant(@RequestBody Menu menu) {
+public ResponseEntity<Menu> createMenu(
+  @ApiParam(
+    name =  "menu",
+    value = "Menu Object",
+    required = true)   
+@RequestBody Menu menu) {
   try {
     Menu _menu = menuRepository.save(new Menu(menu.getName(), menu.getDescription()));
     return new ResponseEntity<>(_menu, HttpStatus.CREATED);
@@ -58,8 +75,20 @@ public ResponseEntity<Menu> createRestaurant(@RequestBody Menu menu) {
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+@ApiOperation(value = "Modify Menu"
+,notes = "Require token validation")
 @PutMapping("/private/menus/{id}")
-public ResponseEntity<Menu> updateMenu(@PathVariable("id") long id, @RequestBody Menu menu) {
+public ResponseEntity<Menu> updateMenu(
+  @ApiParam(
+    name =  "id",
+    value = "Menu id",
+    required = true)    
+@PathVariable("id") long id, 
+@ApiParam(
+  name =  "menu",
+  value = "Menu Object",
+  required = true)   
+@RequestBody Menu menu) {
   Optional<Menu> menuData = menuRepository.findById(id);
 
   if (menuData.isPresent()) {
@@ -71,8 +100,15 @@ public ResponseEntity<Menu> updateMenu(@PathVariable("id") long id, @RequestBody
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
+@ApiOperation(value = "Delete Menu"
+,notes = "Require token validation")
 @DeleteMapping("/private/menus/{id}")
-public ResponseEntity<HttpStatus> deleteMenu(@PathVariable("id") long id) {
+public ResponseEntity<HttpStatus> deleteMenu(
+  @ApiParam(
+    name =  "id",
+    value = "Menu id",
+    required = true)    
+@PathVariable("id") long id) {
   try {
     menuRepository.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

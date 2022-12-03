@@ -22,6 +22,7 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 
 
@@ -32,11 +33,18 @@ public class ApiUserController {
 
 @Autowired
 UserRepository userRepository;
-@ApiOperation(value = "Acá nombramos la operación"
-,notes = "Podemos incluir una descripción más detallada que será útil al cliente")
+@ApiOperation(value = "List Users"
+,notes = "List all available users: require validation")
 
 @GetMapping("/users")
-public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) {
+public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) 
+@ApiParam(
+  name =  "name",
+  type = "String",
+  value = "First Name of the user",
+  example = "juan",
+  required = false) 
+String name) {
   try {
     List<User> users = new ArrayList<User>();
       userRepository.findAll().forEach(users::add);
@@ -50,8 +58,15 @@ public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) St
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+@ApiOperation(value = "Create Users"
+,notes = "Require validation")
 @PostMapping("/private/users")
-public ResponseEntity<User> createRestaurant(@RequestBody User user) {
+public ResponseEntity<User> createUser(
+  @ApiParam(
+    name =  "user",
+    value = "User Object",
+    required = true)  
+@RequestBody User user) {
   try {
     User _user = userRepository.save(new User(user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getPassword()));
     return new ResponseEntity<>(_user, HttpStatus.CREATED);
@@ -59,8 +74,20 @@ public ResponseEntity<User> createRestaurant(@RequestBody User user) {
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+@ApiOperation(value = "Modifify User"
+,notes = "Require validation")
 @PutMapping("/private/users/{id}")
-public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
+public ResponseEntity<User> updateUser(
+  @ApiParam(
+    name =  "id",
+    value = "User id",
+    required = true)  
+    @PathVariable("id") long id, 
+    @ApiParam(
+      name =  "user",
+      value = "User Object",
+      required = true)  
+    @RequestBody User user) {
   Optional<User> userData = userRepository.findById(id);
 
   if (userData.isPresent()) {
@@ -72,8 +99,15 @@ public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
+@ApiOperation(value = "Delete User"
+,notes = "Require validation")
 @DeleteMapping("/private/users/{id}")
-public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") long id) {
+public ResponseEntity<HttpStatus> deleteUser(
+  @ApiParam(
+    name =  "id",
+    value = "User id",
+    required = true)    
+@PathVariable("id") long id) {
   try {
     userRepository.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

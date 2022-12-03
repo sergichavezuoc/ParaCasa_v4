@@ -9,7 +9,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.JwtTokenUtil;
 import com.example.demo.model.JwtRequest;
 import com.example.demo.model.JwtResponse;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 @RestController
 @CrossOrigin
@@ -31,9 +33,15 @@ public class JwtAuthenticationController {
 
 	@Autowired
 	private JwtUserDetailsService jwtInMemoryUserDetailsService;
-
+	@ApiOperation(value = "Create Authentication Token"
+	,notes = "Require username and password in bod")
 	@RequestMapping(value = "/api/authenticate", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
+	public ResponseEntity<?> createAuthenticationToken(
+		@ApiParam(
+			name =  "authenticactionRequest",
+			value = "JwtRequest Object",
+			required = true)   
+	@RequestBody JwtRequest authenticationRequest)
 			throws Exception {
 
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());

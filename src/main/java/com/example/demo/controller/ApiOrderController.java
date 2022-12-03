@@ -17,12 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.example.demo.model.Menu;
 import com.example.demo.model.Order;
 import com.example.demo.model.User;
 import com.example.demo.repository.OrderRepository;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 
 
@@ -33,8 +34,10 @@ public class ApiOrderController {
 
 @Autowired
 OrderRepository orderRepository;
+@ApiOperation(value = "List Orders"
+,notes = "List all available Orders: require token validation")
 @GetMapping("/orders")
-public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false) String name) {
+public ResponseEntity<List<Order>> getAllOrders() {
   try {
     List<Order> orders = new ArrayList<Order>();
       orderRepository.findAll().forEach(orders::add);
@@ -48,8 +51,20 @@ public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false) 
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+@ApiOperation(value = "Create Order"
+,notes = "Require token validation")
 @PostMapping("/private/orders")
-public ResponseEntity<Order> createRestaurant(@RequestBody User user, @RequestBody Menu menu) {
+public ResponseEntity<Order> createRestaurant(
+  @ApiParam(
+    name =  "user",
+    value = "User Object",
+    required = true)    
+@RequestBody User user, 
+@ApiParam(
+  name =  "menu",
+  value = "Menu Object",
+  required = true) 
+@RequestBody Menu menu) {
   try {
     Order _order = orderRepository.save(new Order(user, menu));
     return new ResponseEntity<>(_order, HttpStatus.CREATED);
@@ -57,8 +72,25 @@ public ResponseEntity<Order> createRestaurant(@RequestBody User user, @RequestBo
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+@ApiOperation(value = "Modifify Order"
+,notes = "Require validation")
 @PutMapping("/private/orders/{id}")
-public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBody LocalDateTime dateAdded, @RequestBody User user) {
+public ResponseEntity<Order> updateOrder(
+  @ApiParam(
+    name =  "id",
+    value = "User id",
+    required = true)    
+@PathVariable("id") long id, 
+@ApiParam(
+  name =  "dateAdded",
+  value = "LocalDateTime",
+  required = true)   
+@RequestBody LocalDateTime dateAdded, 
+@ApiParam(
+  name =  "user",
+  value = "User Object",
+  required = true)    
+@RequestBody User user) {
   Optional<Order> orderData = orderRepository.findById(id);
 
   if (orderData.isPresent()) {
@@ -70,8 +102,15 @@ public ResponseEntity<Order> updateOrder(@PathVariable("id") long id, @RequestBo
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
+@ApiOperation(value = "Delete Orderr"
+,notes = "Require validation")
 @DeleteMapping("/private/orders/{id}")
-public ResponseEntity<HttpStatus> deleteOrder(@PathVariable("id") long id) {
+public ResponseEntity<HttpStatus> deleteOrder(
+  @ApiParam(
+    name =  "id",
+    value = "Order id",
+    required = true)     
+@PathVariable("id") long id) {
   try {
     orderRepository.deleteById(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

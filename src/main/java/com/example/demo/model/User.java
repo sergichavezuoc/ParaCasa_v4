@@ -6,10 +6,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-
-import io.swagger.annotations.ApiModelProperty;
  
 @Entity
 @Table(name = "users")
@@ -19,23 +15,13 @@ public class User {
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ApiModelProperty(position = 0 )
     private String username;
-    @ApiModelProperty(position = 1 )
     private String password;
-    @ApiModelProperty(position = 2 )
     private String role;
-    @ApiModelProperty(position = 3 )
     private boolean enabled;
-    @ApiModelProperty(position = 4 )
     private boolean premium;
-    @ApiModelProperty(position = 5 )
-    @Email(regexp=".*@.*\\..*", message = "Email should be valid")
     private String email;
-    @ApiModelProperty(position = 6 )
-    @NotNull(message = "Name cannot be null")
     private String name;
-    @ApiModelProperty(position = 7 )
     private String surname;
     public User(){
         
